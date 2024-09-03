@@ -1,0 +1,6 @@
+server:
+  port: 8080  # Port number for the API Gateway
+
+spring:
+  application:
+    name: api-gateway  # Name of the microservice
