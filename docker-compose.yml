@@ -1,0 +1,101 @@
+services:
+  eureka-server:
+    image: eurekaserver:latest
+    build:
+      context: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - logistics-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://eureka-server:8761" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  api-gateway:
+    image: apigateway:latest
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
+      - SPRINGDOC_API_DOCS_PATH=/v3/api-docs
+      - SPRINGDOC_SWAGGER_UI_PATH=/swagger-ui.html
+    networks:
+      - logistics-network
+
+  auth-service:
+    image: authservice:latest
+    build:
+      context: ./auth-service
+    container_name: auth-service
+    depends_on:
+      - eureka-server
+      - database
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/logistics_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    networks:
+      - logistics-network
+
+  shipment-service:
+    image: shipmentservice:latest
+    build:
+      context: ./shipment-service
+    container_name: shipment-service
+    depends_on:
+      - eureka-server
+      - database
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/logistics_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    networks:
+      - logistics-network
+
+  courier-service:
+    image: courierservice:latest
+    build:
+      context: ./courier-service
+    container_name: courier-service
+    depends_on:
+      - eureka-server
+      - database
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/logistics_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    networks:
+      - logistics-network
+
+  database:
+    image: postgres:15
+    container_name: postgres-database
+    environment:
+      POSTGRES_DB: logistics_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - logistics-network
+
+networks:
+  logistics-network:
+    driver: bridge
+    name: logistics-network
+
+volumes:
+  postgres_data:

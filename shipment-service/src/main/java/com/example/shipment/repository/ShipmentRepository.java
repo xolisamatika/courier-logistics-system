@@ -1,6 +1,6 @@
 package com.example.shipment.repository;
 
-import com.example.shipment.model.Shipment;
+import com.example.shipment.entity.Shipment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

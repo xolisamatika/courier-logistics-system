@@ -1,6 +1,6 @@
 package com.example.shipment.controller;
 
-import com.example.shipment.model.Shipment;
+import com.example.shipment.entity.Shipment;
 import com.example.shipment.service.ShipmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +13,11 @@ import java.util.Optional;
 @RequestMapping("/api/shipments")
 public class ShipmentController {
 
-    @Autowired
-    private ShipmentService shipmentService;
+    private final ShipmentService shipmentService;
+
+    public ShipmentController(ShipmentService shipmentService) {
+        this.shipmentService = shipmentService;
+    }
 
     @PostMapping
     public Shipment createShipment(@RequestBody Shipment shipment) {

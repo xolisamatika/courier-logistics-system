@@ -1,6 +1,6 @@
 package com.example.shipment.service;
 
-import com.example.shipment.model.Shipment;
+import com.example.shipment.entity.Shipment;
 import com.example.shipment.repository.ShipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,8 +11,11 @@ import java.util.Optional;
 @Service
 public class ShipmentService {
 
-    @Autowired
-    private ShipmentRepository shipmentRepository;
+    private final ShipmentRepository shipmentRepository;
+
+    public ShipmentService(ShipmentRepository shipmentRepository) {
+        this.shipmentRepository = shipmentRepository;
+    }
 
     public Shipment createShipment(Shipment shipment) {
         shipment.setStatus("Created");

@@ -4,3 +4,56 @@ server:
 spring:
   application:
     name: api-gateway  # Name of the microservice
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: lb://auth-service  # Load balancer URI for auth-service
+          predicates:
+            - Path=/auth/**  # Route requests to /auth/** to auth-service
+        - id: shipment-service
+          uri: lb://shipment-service  # Load balancer URI for shipment-service
+          predicates:
+            - Path=/shipments/**  # Route requests to /shipments/** to shipment-service
+        - id: courier-service
+          uri: lb://courier-service  # Load balancer URI for courier-service
+          predicates:
+            - Path=/couriers/**
+
+    discovery:
+      locator:
+        enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8081/auth-service/.well-known/jwks.json  # URL to obtain JWT signing keys
+
+logging:
+  level:
+    root: INFO  # Default logging level
+    org.springframework.cloud.gateway: INFO  # Debug logging for Gateway
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"  # Expose all management endpoints for monitoring
+  endpoint:
+    health:
+      show-details: always  # Show detailed health information
+
+# Custom filter for JWT authentication
+filter:
+  jwt-authentication:
+    url-patterns: /auth/**,/shipments/**,/couriers/**  # Apply JWT authentication to these paths
