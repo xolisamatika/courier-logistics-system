@@ -1,0 +1,22 @@
+server:
+  port: 8761  # Port number on which the Eureka server will run
+
+eureka:
+  instance:
+    hostname: localhost  # Hostname of the Eureka server
+  client:
+    register-with-eureka: false  # Eureka server doesn't register with itself
+    fetch-registry: false  # Eureka server doesn't fetch the registry
+  server:
+    enable-self-preservation: false  # Enable/disable self-preservation mode (for testing purposes)
+  dashboard:
+    enabled: true  # Enable the Eureka dashboard
+
+spring:
+  application:
+    name: eureka-server  # Name of the Eureka server application
+
+logging:
+  level:
+    org.springframework: INFO  # Logging level configuration
+
